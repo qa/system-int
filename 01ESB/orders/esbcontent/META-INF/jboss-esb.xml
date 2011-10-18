@@ -11,12 +11,73 @@
   <service category="orders"
    description="service for processing http input" invmScope="GLOBAL" name="http-input">
    <listeners>
-    <http-gateway busidref="http-channel" name="http-gw" urlPattern="/*"/>
+    <http-gateway busidref="http-channel" name="http-gw" urlPattern="/*">
+     <asyncResponse statusCode="200"/>
+    </http-gateway>
    </listeners>
    <actions>
     <action
      class="org.jboss.fit.systemintegration.actions.ProcessHttpMessageAction"
      name="process-message" process="processMessage"/>
+    <action class="org.jboss.soa.esb.actions.StaticRouter" name="router-to-process">
+     <property name="destinations">
+      <route-to destination-name="order-processing"
+       service-category="orders" service-name="process"/>
+     </property>
+    </action>
+   </actions>
+  </service>
+  <service category="orders" description="process received orders"
+   invmScope="GLOBAL" name="process">
+   <actions>
+    <action class="org.jboss.soa.esb.actions.SystemPrintln" name="SImpleLogger">
+     <property name="message" value="Processing"/>
+    </action>
+    <action class="org.jboss.soa.esb.actions.ContentBasedRouter" name="route-success-failure">
+     <property name="cbrAlias" value="Regex"/>
+     <property name="ruleLanguage"/>
+     <property name="destinations">
+      <route-to destination-name="item-available"
+       expression=".*color=(red|green|black|white).*"
+       service-category="orders" service-name="item-available"/>
+      <route-to destination-name="item-not-available"
+       expression=".*color=blue.*" service-category="orders" service-name="item-not-available"/>
+     </property>
+    </action>
+   </actions>
+  </service>
+  <service category="orders"
+   description="if item is available, is saved to db and confirmation sent by email"
+   invmScope="GLOBAL" name="item-available">
+   <actions>
+    <action class="org.jboss.soa.esb.actions.routing.email.EmailRouter" name="if-success-email">
+     <property name="from" value="javaeelab@seznam.cz"/>
+     <property name="sendTo" value="jsedlace@redhat.com"/>
+     <property name="subject" value="Order is successful!"/>
+     <property name="host" value="smtp.seznam.cz"/>
+     <property name="port" value="25"/>
+     <property name="username" value="javaeelab@seznam.cz"/>
+     <property name="password" value="javaeelab2011"/>
+     <property name="unwrap" value="true"/>
+     <property name="auth" value="true"/>
+     <property name="message" value="Your order is succesfull, additional information is below."/>
+    </action>
+   </actions>
+  </service>
+  <service category="orders" description="if the item is not available"
+   invmScope="GLOBAL" name="item-not-available">
+   <actions>
+    <action class="org.jboss.soa.esb.actions.routing.email.EmailRouter" name="if-failure-email">
+     <property name="from" value="javaeelab@seznam.cz"/>
+     <property name="sendTo" value="jsedlace@redhat.com"/>
+     <property name="subject" value="Order failed!"/>
+     <property name="host" value="smtp.seznam.cz"/>
+     <property name="port" value="25"/>
+     <property name="username" value="javaeelab@seznam.cz"/>
+     <property name="password" value="javaeelab2011"/>
+     <property name="unwrap" value="true"/>
+     <property name="auth" value="true"/>
+    </action>
    </actions>
   </service>
  </services>
