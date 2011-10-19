@@ -6,6 +6,14 @@
   <http-provider name="http">
    <http-bus busid="http-channel"/>
   </http-provider>
+  <fs-provider name="fs">
+   <fs-bus busid="fs-channel">
+    <fs-message-filter directory="/home/jeelab/data/in"
+     error-delete="false" error-directory="/home/jeelab/data/error"
+     error-suffix=".error" input-suffix=".xml" post-delete="false"
+     post-directory="/home/jeelab/data/out" post-suffix=".done" work-suffix=".work"/>
+   </fs-bus>
+  </fs-provider>
  </providers>
  <services>
   <service category="orders"
@@ -23,6 +31,23 @@
      <property name="destinations">
       <route-to destination-name="order-processing"
        service-category="orders" service-name="process"/>
+     </property>
+    </action>
+   </actions>
+  </service>
+  <service category="orders" description="filesystem input for xmlfiles"
+   invmScope="GLOBAL" name="fs-input">
+   <listeners>
+    <fs-listener busidref="fs-channel" is-gateway="true" name="fs-gw" poll-frequency-seconds="10"/>
+   </listeners>
+   <actions>
+    <action class="org.jboss.soa.esb.smooks.SmooksAction" name="xml-transform">
+     <property name="smooksConfig" value="/smooks-config.xml"/>
+     <property name="resultType" value="JAVA"/>
+    </action>
+    <action class="org.jboss.soa.esb.actions.StaticRouter" name="fs-router">
+     <property name="destinations">
+      <route-to destination-name="process" service-category="orders" service-name="process"/>
      </property>
     </action>
    </actions>
