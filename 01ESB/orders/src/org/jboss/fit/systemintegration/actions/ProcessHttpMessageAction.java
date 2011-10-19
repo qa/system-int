@@ -27,7 +27,7 @@ public class ProcessHttpMessageAction extends AbstractActionLifecycle {
 		o.setId(Long.parseLong(params.get("id")[0]));
 		o.setColor(params.get("color")[0]);
 		msgMap.put("order", o);
-		body.add(msgMap);
+		body.add("orderMap", msgMap);
 		
 		return message;
 	}

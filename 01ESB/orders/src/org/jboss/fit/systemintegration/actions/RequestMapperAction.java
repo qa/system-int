@@ -16,7 +16,7 @@ public class RequestMapperAction extends AbstractActionLifecycle {
 	}
 	
 	public Message process(Message message) {
-		Map msgMap = (Map)message.getBody().get();
+		Map msgMap = (Map)message.getBody().get("orderMap");
 		
 		msgMap.put("message", msgMap.get("order").toString());
 		
