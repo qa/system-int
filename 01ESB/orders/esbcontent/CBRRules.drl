@@ -1,0 +1,26 @@
+package org.jboss.fit.systemintergration.cbr
+
+import org.jboss.soa.esb.message.Message
+import org.jboss.fit.systemintegration.pojo.Order
+import java.util.Map
+
+global java.util.List destinations;
+
+rule available
+	when
+		Message(1==1)
+		//Message(((Order)((Map)body.get())["order"]).color == "red")
+	then
+		System.out.println("available");
+		destinations.add("item-available");
+end
+
+rule notAvailable
+
+	when
+		Message(1!=1)
+		//Message(((Order)((Map)body.get())["order"]) == "blue")
+	then
+		System.out.println("not available");
+		destinations.add("item-not-available");
+end

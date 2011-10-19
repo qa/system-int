@@ -9,7 +9,7 @@ import javax.jws.WebService;
 @Stateless
 public class LoggerService {
 	
-	@WebMethod(action="name")
+	@WebMethod(action="log")
 	public void log(@WebParam(name="message") String message) {
 		System.out.println("#########LoggerService log start########");
 		System.out.println(message);		
