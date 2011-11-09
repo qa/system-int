@@ -1,0 +1,65 @@
+<definitions name='EchoWSService' targetNamespace='http://www.jboss.org/vut/ws/echo' xmlns='http://schemas.xmlsoap.org/wsdl/' xmlns:soap='http://schemas.xmlsoap.org/wsdl/soap/' xmlns:tns='http://www.jboss.org/vut/ws/echo' xmlns:xsd='http://www.w3.org/2001/XMLSchema'>
+ <types>
+  <xs:schema targetNamespace='http://www.jboss.org/vut/ws/echo' version='1.0' xmlns:tns='http://www.jboss.org/vut/ws/echo' xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+   <xs:element name='echo' type='tns:echo'/>
+   <xs:element name='echoResponse' type='tns:echoResponse'/>
+   <xs:element name='fastEcho' type='tns:fastEcho'/>
+   <xs:complexType name='echo'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='message' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='echoResponse'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='return' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='fastEcho'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='message' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+  </xs:schema>
+ </types>
+ <message name='EchoService_fastEcho'>
+  <part element='tns:fastEcho' name='fastEcho'></part>
+ </message>
+ <message name='EchoService_echo'>
+  <part element='tns:echo' name='echo'></part>
+ </message>
+ <message name='EchoService_echoResponse'>
+  <part element='tns:echoResponse' name='echoResponse'></part>
+ </message>
+ <portType name='EchoService'>
+  <operation name='echo' parameterOrder='echo'>
+   <input message='tns:EchoService_echo'></input>
+   <output message='tns:EchoService_echoResponse'></output>
+  </operation>
+  <operation name='fastEcho'>
+   <input message='tns:EchoService_fastEcho'></input>
+  </operation>
+ </portType>
+ <binding name='EchoServiceBinding' type='tns:EchoService'>
+  <soap:binding style='document' transport='http://schemas.xmlsoap.org/soap/http'/>
+  <operation name='echo'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='fastEcho'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+  </operation>
+ </binding>
+ <service name='EchoWSService'>
+  <port binding='tns:EchoServiceBinding' name='EchoServicePort'>
+   <soap:address location='http://localhost:8080/RiftSawLab/EchoWS'/>
+  </port>
+ </service>
+</definitions>

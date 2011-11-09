@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.jboss.org/vut/bpel/order" xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop" xmlns:wsdl="http://www.jboss.org/vut/ws/echo" name="AsyncEchoBP" targetNamespace="http://www.jboss.org/vut/bpel/order">
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     TYPE DEFINITION - List of services participating in this BPEL process 
+     The default output of the BPEL designer uses strings as input and 
+     output to the BPEL Process. But you can define or import any XML 
+     Schema type and us them as part of the message types.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->    
+    <plnk:partnerLinkType name="ServicePartnerLinkType">
+    <plnk:role name="ServiceRole" portType="wsdl:EchoService"/>
+  </plnk:partnerLinkType>
+    <import location="EchoWS.wsdl" namespace="http://www.jboss.org/vut/ws/echo"/>
+    <types>  
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.jboss.org/vut/bpel/order">
+                
+            <element name="AsyncEchoBPRequest">
+                <complexType>
+                    <sequence>
+                        <element name="input" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+                  
+            <element name="AsyncEchoBPResponse">
+                <complexType>
+                    <sequence>
+                        <element name="result" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            
+        </schema>
+    </types>
+  
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     MESSAGE TYPE DEFINITION - Definition of the message types used as 
+     part of the port type defintions
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->    
+    <message name="AsyncEchoBPRequestMessage">
+        <part element="tns:AsyncEchoBPRequest" name="payload"/>
+    </message>
+    
+    <message name="AsyncEchoBPResponseMessage">
+        <part element="tns:AsyncEchoBPResponse" name="payload"/>
+    </message>
+
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     PORT TYPE DEFINITION - A port type groups a set of operations into
+     a logical service unit.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- portType implemented by the AsyncEchoBP BPEL process -->
+    <portType name="AsyncEchoBP">
+        <operation name="initiate">
+            <input message="tns:AsyncEchoBPRequestMessage"/>
+        </operation>
+    </portType>
+
+    <!-- portType implemented by the requester of AsyncEchoBP BPEL process 
+         for asynchronous callback purposes
+         -->
+    <portType name="AsyncEchoBPCallback">
+        <operation name="onResult">
+            <input message="tns:AsyncEchoBPResponseMessage"/>
+        </operation>
+    </portType>
+
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     PARTNER LINK TYPE DEFINITION
+         the AsyncEchoBP partnerLinkType binds the provider and
+         requester portType into an asynchronous conversation.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->    
+    <plnk:partnerLinkType name="AsyncEchoBP">
+        <plnk:role name="AsyncEchoBPProvider" portType="tns:AsyncEchoBP"/>
+        <plnk:role name="AsyncEchoBPRequester" portType="tns:AsyncEchoBPCallback"/>
+    </plnk:partnerLinkType>   
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     BINDING DEFINITION - Defines the message format and protocol details
+     for a web service.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <binding name="AsyncEchoBPBinding" type="tns:AsyncEchoBP">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="initiate">
+            <soap:operation soapAction="http://www.jboss.org/vut/bpel/order/initiate"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+        </operation>
+    </binding>
+
+    <binding name="AsyncEchoBPCallbackBinding" type="tns:AsyncEchoBPCallback">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="onResult">
+            <soap:operation soapAction="http://www.jboss.org/vut/bpel/order/onResult"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+        </operation>
+    </binding>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     SERVICE DEFINITION - A service groups a set of ports into
+     a service unit.
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <service name="AsyncEchoBP">
+        <port binding="tns:AsyncEchoBPBinding" name="AsyncEchoBPPort">
+    		<soap:address location="http://localhost:8080/AsyncEchoBP"/>
+        </port>
+    </service>
+
+    <service name="AsyncEchoBPCallback">
+        <port binding="tns:AsyncEchoBPCallbackBinding" name="AsyncEchoBPPortCallbackPort">
+    		<soap:address location="http://localhost:8080/AsyncEchoBPCallback"/>
+        </port>
+    </service>
+</definitions>

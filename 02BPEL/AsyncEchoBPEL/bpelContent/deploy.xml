@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03" xmlns:echo="http://www.jboss.org/vut/ws/echo" xmlns:order="http://www.jboss.org/vut/bpel/order">
+  <process name="order:AsyncEchoBP">
+    <active>true</active>
+    <retired>false</retired>
+    <process-events generate="all"/>
+    <provide partnerLink="client">
+      <service name="order:AsyncEchoBP" port="AsyncEchoBPPort"/>
+    </provide>
+    <invoke partnerLink="client">
+      <service name="order:AsyncEchoBPCallback" port="AsyncEchoBPPortCallbackPort"/>
+    </invoke>
+    <invoke partnerLink="service">
+      <service name="echo:EchoWSService" port="EchoServicePort"/>
+    </invoke>
+  </process>
+  <process name="order:EchoBP">
+    <process-events generate="all"/>
+    <provide partnerLink="client">
+      <service name="order:EchoBP" port="EchoBPPort"/>
+    </provide>
+    <provide partnerLink="asyncService">
+      <service name="order:AsyncEchoBPCallback" port="AsyncEchoBPPortCallbackPort"/>
+    </provide>
+    <invoke partnerLink="asyncService">
+      <service name="order:AsyncEchoBP" port="AsyncEchoBPPort"/>
+    </invoke>
+  </process>
+</deploy>

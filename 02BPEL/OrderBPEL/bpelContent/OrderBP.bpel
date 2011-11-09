@@ -253,10 +253,28 @@
                         </bpel:receive>
                         <bpel:if name="FindirDecision">
                             <bpel:condition><![CDATA[$ReceiveFindirDecision.payload/tns:type = 'approved']]></bpel:condition>
-                            <bpel:sequence name="Sequence">
-                                <bpel:empty name="Empty"></bpel:empty>
-                            
-                    
+                            <bpel:sequence name="Sequence"><bpel:assign validate="no" name="AssignApproved">
+                    <bpel:copy>
+                        <bpel:from>
+                            <bpel:literal>
+                                <tns:setOrderState xmlns:tns="http://www.jboss.org/vut/order" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><orderId>0</orderId>
+  <newState>APPROVED</newState>
+
+                                </tns:setOrderState>
+                            </bpel:literal>
+                        </bpel:from>
+                        <bpel:to variable="SetOrderStateIn" part="setOrderState"></bpel:to>
+                    </bpel:copy>
+                    <bpel:copy>
+                        <bpel:from variable="orderID"></bpel:from>
+                        <bpel:to part="setOrderState" variable="SetOrderStateIn">
+                            <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+                                <![CDATA[orderId]]>
+                            </bpel:query>
+                        </bpel:to>
+                    </bpel:copy>
+                </bpel:assign>
+                    <bpel:invoke name="SetFinalOrderState" partnerLink="OrderModule" operation="setOrderState" portType="ns1:OrderWS" inputVariable="SetOrderStateIn"></bpel:invoke>
     
     
     
@@ -264,9 +282,26 @@
                             </bpel:sequence>
                             <bpel:else>
                                 <bpel:sequence name="Sequence">
-                                    <bpel:empty name="Empty"></bpel:empty>
-                                    
-                    
+                    <bpel:assign validate="no" name="AssignDeclined">
+                        <bpel:copy>
+                            <bpel:from>
+                                <bpel:literal>
+                                    <tns:setOrderState xmlns:tns="http://www.jboss.org/vut/order" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><orderId>0</orderId>
+  <newState>DECLINED</newState>
+
+                                    </tns:setOrderState>
+                                </bpel:literal>
+                            </bpel:from>
+                            <bpel:to variable="SetOrderStateIn" part="setOrderState"></bpel:to>
+                        </bpel:copy>
+                        <bpel:copy>
+                            <bpel:from variable="orderID"></bpel:from>
+                            <bpel:to part="setOrderState" variable="SetOrderStateIn">
+                                <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[orderId]]></bpel:query>
+                            </bpel:to>
+                        </bpel:copy>
+                    </bpel:assign>
+                    <bpel:invoke name="SetFinalOrderState" partnerLink="OrderModule" operation="setOrderState" portType="ns1:OrderWS" inputVariable="SetOrderStateIn"></bpel:invoke>
     
     
 </bpel:sequence>
