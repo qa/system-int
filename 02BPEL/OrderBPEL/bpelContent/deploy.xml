@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03" xmlns:order="http://www.jboss.org/vut/bpel/order" xmlns:order_1="http://www.jboss.org/vut/order">
+  <process name="order:OrderBP">
+    <active>true</active>
+    <retired>false</retired>
+    <process-events generate="all"/>
+    <provide partnerLink="Interface">
+      <service name="order:OrderBP" port="OrderBPPort"/>
+    </provide>
+    <invoke partnerLink="OrderModule">
+      <service name="order_1:OrderWSService" port="OrderWSPort"/>
+    </invoke>
+  </process>
+</deploy>

@@ -1,0 +1,95 @@
+<definitions name='OrderWSService' targetNamespace='http://www.jboss.org/vut/order' xmlns='http://schemas.xmlsoap.org/wsdl/' xmlns:soap='http://schemas.xmlsoap.org/wsdl/soap/' xmlns:tns='http://www.jboss.org/vut/order' xmlns:xsd='http://www.w3.org/2001/XMLSchema'>
+ <types>
+  <xs:schema targetNamespace='http://www.jboss.org/vut/order' version='1.0' xmlns:tns='http://www.jboss.org/vut/order' xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+   <xs:element name='createOrder' type='tns:createOrder'/>
+   <xs:element name='createOrderResponse' type='tns:createOrderResponse'/>
+   <xs:element name='setApprover' type='tns:setApprover'/>
+   <xs:element name='setOrderState' type='tns:setOrderState'/>
+   <xs:complexType name='createOrder'>
+    <xs:sequence>
+     <xs:element name='creator' type='xs:long'/>
+     <xs:element minOccurs='0' name='itemName' type='xs:string'/>
+     <xs:element minOccurs='0' name='itemPrice' type='xs:decimal'/>
+     <xs:element name='quantity' type='xs:int'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='createOrderResponse'>
+    <xs:sequence>
+     <xs:element name='return' type='xs:long'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='setApprover'>
+    <xs:sequence>
+     <xs:element name='orderId' type='xs:long'/>
+     <xs:element minOccurs='0' name='approverRole' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='setOrderState'>
+    <xs:sequence>
+     <xs:element name='orderId' type='xs:long'/>
+     <xs:element minOccurs='0' name='newState' type='tns:orderStateType'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:simpleType name='orderStateType'>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='NEW'/>
+     <xs:enumeration value='APPROVED'/>
+     <xs:enumeration value='DECLINED'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:schema>
+ </types>
+ <message name='OrderWS_createOrder'>
+  <part element='tns:createOrder' name='createOrder'></part>
+ </message>
+ <message name='OrderWS_createOrderResponse'>
+  <part element='tns:createOrderResponse' name='createOrderResponse'></part>
+ </message>
+ <message name='OrderWS_setOrderState'>
+  <part element='tns:setOrderState' name='setOrderState'></part>
+ </message>
+ <message name='OrderWS_setApprover'>
+  <part element='tns:setApprover' name='setApprover'></part>
+ </message>
+ <portType name='OrderWS'>
+  <operation name='createOrder' parameterOrder='createOrder'>
+   <input message='tns:OrderWS_createOrder'></input>
+   <output message='tns:OrderWS_createOrderResponse'></output>
+  </operation>
+  <operation name='setApprover'>
+   <input message='tns:OrderWS_setApprover'></input>
+  </operation>
+  <operation name='setOrderState'>
+   <input message='tns:OrderWS_setOrderState'></input>
+  </operation>
+ </portType>
+ <binding name='OrderWSBinding' type='tns:OrderWS'>
+  <soap:binding style='document' transport='http://schemas.xmlsoap.org/soap/http'/>
+  <operation name='createOrder'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='setApprover'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+  </operation>
+  <operation name='setOrderState'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+  </operation>
+ </binding>
+ <service name='OrderWSService'>
+  <port binding='tns:OrderWSBinding' name='OrderWSPort'>
+   <soap:address location='http://localhost:8080/RiftSawLab/OrderWS'/>
+  </port>
+ </service>
+</definitions>
