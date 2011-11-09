@@ -7,6 +7,11 @@
      but you can define or import any XML Schema type and use them as part 
      of the message types.
      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->    
+    <plnk:partnerLinkType name="OrderWSLinkType">
+    <plnk:role name="OrderWSRole" portType="wsdl:OrderWS"/>
+  </plnk:partnerLinkType>
+    
+    <import location="OrderWS.wsdl" namespace="http://www.jboss.org/vut/order"/>
     <types>
         <schema xmlns="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.jboss.org/vut/bpel/order">
 

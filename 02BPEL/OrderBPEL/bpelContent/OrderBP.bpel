@@ -9,7 +9,8 @@
 
     <!-- Import the client WSDL -->
     <bpel:import namespace="http://www.jboss.org/vut/order" location="OrderWS.wsdl" importType="http://schemas.xmlsoap.org/wsdl/"></bpel:import>
-    <bpel:import location="OrderBPArtifacts.wsdl" namespace="http://www.jboss.org/vut/bpel/order" importType="http://schemas.xmlsoap.org/wsdl/" />
+    <bpel:import location="OrderBPArtifacts.wsdl" namespace="http://www.jboss.org/vut/bpel/order" 
+	        importType="http://schemas.xmlsoap.org/wsdl/" />
          
     <!-- ================================================================= -->         
     <!-- PARTNERLINKS                                                      -->
@@ -21,7 +22,7 @@
                      partnerLinkType="tns:OrderBP"
                      myRole="OrderBPProvider"
                      />
-        
+        <bpel:partnerLink name="OrderModule" partnerLinkType="tns:OrderWSLinkType" partnerRole="OrderWSRole"></bpel:partnerLink>
     </bpel:partnerLinks>
   
     <!-- ================================================================= -->         
@@ -37,7 +38,7 @@
         <bpel:variable name="ReceiveTechDecision" messageType="tns:techDecideRequest"></bpel:variable>
         <bpel:variable name="ReplyTechDecision" messageType="tns:techDecideResponse"></bpel:variable>
         <bpel:variable name="SetOrderStateIn" messageType="ns1:OrderWS_setOrderState"></bpel:variable>
-        
+        <bpel:variable name="orderID" type="ns2:long"></bpel:variable>
         <bpel:variable name="SetFindirApproverIn" messageType="ns1:OrderWS_setApprover"></bpel:variable>
         
         <bpel:variable name="ReceiveFindirDecision" messageType="tns:findirDecideRequest"></bpel:variable>
@@ -57,15 +58,110 @@
                  portType="tns:OrderBP"
                  operation="createOrder" variable="ReceiveCreate"
                  createInstance="yes"/>
-        
+        <bpel:assign validate="no" name="AssignOrderDetails">
+            <bpel:copy>
+                <bpel:from>
+                    <bpel:literal>
+                        <tns:createOrder xmlns:tns="http://www.jboss.org/vut/order" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><creator>0</creator>
+  <itemName>itemName</itemName>
+  <itemPrice>0.0</itemPrice>
+  <quantity>0</quantity>
+
+                        </tns:createOrder>
+                    </bpel:literal>
+                </bpel:from>
+                <bpel:to variable="CreateOrderIn" part="createOrder"></bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="ReceiveCreate">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+                        <![CDATA[tns:creator]]>
+                    </bpel:query>
+                </bpel:from>
+                <bpel:to part="createOrder" variable="CreateOrderIn">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[creator]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="ReceiveCreate">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[tns:itemName]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="createOrder" variable="CreateOrderIn">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[itemName]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="ReceiveCreate">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[tns:itemPrice]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="createOrder" variable="CreateOrderIn">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[itemPrice]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="payload" variable="ReceiveCreate">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[tns:quantity]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="createOrder" variable="CreateOrderIn">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[quantity]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+        </bpel:assign>
         
         <!-- Generate reply to synchronous request -->
+        <bpel:invoke name="Create" partnerLink="OrderModule" operation="createOrder" inputVariable="CreateOrderIn" outputVariable="CreateOrderOut"></bpel:invoke>
         
-        
-        
-        
-        
-        <bpel:empty name="Empty"></bpel:empty>
+        <bpel:assign validate="no" name="AssignTechApprover">
+            <bpel:copy>
+                <bpel:from>
+                    <bpel:literal>
+                        <tns:setApprover xmlns:tns="http://www.jboss.org/vut/order" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><orderId>0</orderId>
+  <approverRole>tech</approverRole>
+
+                        </tns:setApprover>
+                    </bpel:literal>
+                </bpel:from>
+                <bpel:to variable="SetTechApproverIn" part="setApprover"></bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="createOrderResponse" variable="CreateOrderOut">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[return]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="setApprover" variable="SetTechApproverIn">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+                        <![CDATA[orderId]]>
+                    </bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            
+        </bpel:assign>
+        <bpel:invoke name="SetTechApprover" partnerLink="OrderModule" operation="setApprover" portType="ns1:OrderWS" inputVariable="SetTechApproverIn"></bpel:invoke>
+        <bpel:assign validate="no" name="AssignOrderID">
+            <bpel:copy>
+                <bpel:from>
+                    <bpel:literal>
+                        <tns:CreateOrderResponce xmlns:tns="http://www.jboss.org/vut/bpel/order" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><tns:newOrderId>0</tns:newOrderId>
+
+                        </tns:CreateOrderResponce>
+                    </bpel:literal>
+                </bpel:from>
+                <bpel:to variable="ReplyCreate" part="payload"></bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="createOrderResponse" variable="CreateOrderOut">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[return]]></bpel:query>
+                </bpel:from>
+                <bpel:to part="payload" variable="ReplyCreate">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[tns:newOrderId]]></bpel:query>
+                </bpel:to>
+            </bpel:copy>
+            <bpel:copy>
+                <bpel:from part="createOrderResponse" variable="CreateOrderOut">
+                    <bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[return]]></bpel:query>
+                </bpel:from>
+                <bpel:to variable="orderID"></bpel:to>
+            </bpel:copy>
+        </bpel:assign>
         <bpel:reply name="ReplyCreate" 
                partnerLink="Interface"
                portType="tns:OrderBP"
