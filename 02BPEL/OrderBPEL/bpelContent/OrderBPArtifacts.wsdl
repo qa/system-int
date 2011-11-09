@@ -10,7 +10,16 @@
     <plnk:partnerLinkType name="OrderWSLinkType">
     <plnk:role name="OrderWSRole" portType="wsdl:OrderWS"/>
   </plnk:partnerLinkType>
-    
+    <vprop:property name="orderID" type="p:long"/>
+    <vprop:propertyAlias messageType="tns:createOrderResponse" part="payload" propertyName="tns:orderID">
+    <vprop:query><![CDATA[/tns:newOrderId]]></vprop:query>
+  </vprop:propertyAlias>
+    <vprop:propertyAlias messageType="tns:findirDecideRequest" part="payload" propertyName="tns:orderID">
+    <vprop:query><![CDATA[/tns:orderId]]></vprop:query>
+  </vprop:propertyAlias>
+    <vprop:propertyAlias messageType="tns:techDecideRequest" part="payload" propertyName="tns:orderID">
+    <vprop:query><![CDATA[/tns:orderId]]></vprop:query>
+  </vprop:propertyAlias>
     <import location="OrderWS.wsdl" namespace="http://www.jboss.org/vut/order"/>
     <types>
         <schema xmlns="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.jboss.org/vut/bpel/order">
